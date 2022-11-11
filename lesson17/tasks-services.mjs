@@ -3,11 +3,11 @@
 import * as tasksData from './tasks-data.mjs'
 
 
-export async function getTasks() {
+export async function getTasks(userToken) {
     return tasksData.getTasks()
 }
 
-export async function getTask(taskId) {
+export async function getTask(taskId, userToken) {
     // Validate taskId
     return tasksData.getTask(taskId)
 }

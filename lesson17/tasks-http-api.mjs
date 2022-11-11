@@ -1,24 +1,28 @@
 // Module that contains the functions that handle all HTTP APi requests.
 // Handle HTTP request means:
 //  - Obtain data from requests. Request data can be obtained from: URI(path, query, fragment), headers, body
-//  - Invoque the corresponding operation on services
+//  - Invoke the corresponding operation on services
 //  - Generate the response
 
 
 import * as tasksServices from './tasks-services.mjs'
 
-export async function getTasks(req, rsp) {
-    rsp.json(await tasksServices.getTasks())
+export let getTasks = handleRequest(getTasksInternal)
+export let getTask = handleRequest(getTaskInternal)
+
+async function getTasksInternal(req, rsp) {
+    rsp.json(await tasksServices.getTasks(req.token))
 }
 
-export async function getTask(req, rsp) {
+async function getTaskInternal(req, rsp) {
     const taskId = req.params.id
-    const task = await tasksServices.getTask(taskId)
+    const task = await tasksServices.getTask(taskId, req.token)
     if(task != undefined) {
         rsp.json(task)
     } else {
         rsp.status(404).json({error: `Task with id ${taskId} not found`})
     }
+
 }
 
 export async function deleteTask(req, rsp) {
@@ -57,6 +61,24 @@ export async function createTask(req, rsp) {
         rsp.status(201).json({status: `new task created`, newTask: newTask })
     } catch(e) {
         rsp.status(400).json({error: `Error creating task: ${e} `})
+    }
+}
+
+
+function handleRequest(handler) {
+    return function(req, rsp) {
+        let token = req.get("Authorization")
+        console.log(token)
+        if(!(token && token.startsWith("Bearer "))) {
+            rsp
+                .status(401)
+                .json({error: `Invalid token`})
+            return
+            
+        }
+        req.token = token.split(" ")[1]
+        handler(req, rsp)
+    
     }
 }
 
