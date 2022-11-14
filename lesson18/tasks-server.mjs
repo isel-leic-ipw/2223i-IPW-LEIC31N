@@ -2,7 +2,7 @@
 // Register all HTTP API routes and starts the server
 
 import express from 'express'
-import * as api from './tasks-http-api.mjs'
+import * as api from './api/tasks-http-api.mjs'
 import swaggerUi from 'swagger-ui-express'
 import yaml from 'yamljs'
 import cors from 'cors'
