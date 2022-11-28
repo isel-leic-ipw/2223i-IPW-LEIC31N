@@ -4,28 +4,49 @@
 //  - Invoke the corresponding operation on services
 //  - Generate the response in HTML format
 
-import url from 'url'
 
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+
 
 
 export default function (tasksServices) {
     // Validate argument
-    
+
     return {
-        getIndex: getIndex
-        
+        getTask: handleRequest(getTask)
     }
 
+    async function getTask(req, rsp) {
+        const taskId = req.params.id
+        const task = await tasksServices.getTask(req.token, taskId)
+        rsp.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <link rel="stylesheet" href="site.css">
+            <meta charset="utf-8">
+            <title>${task.title}</title>
+          </head>
+          <body>
+            <h2>${task.title}</h2>
+            <p>${task.description}</p>
+          </body>
+        </html>
+        `)
 
-    function getIndex(req, rsp) {
-        rsp.set("Content-Type", "text/html")
-        const options = {
-            root: `${__dirname}../../static-files/`
+    }
+
+    function handleRequest(handler) {
+        return async function (req, rsp) {
+            req.token = 'ef604e80-a351-4d13-b78f-c888f3e63b61'
+            try {
+                await handler(req, rsp)
+            } catch (e) {
+                const response = toHttpResponse(e)
+                rsp.status(response.status).json({ error: response.body })
+                console.log(e)
+            }
         }
-        console.log(options)
-        rsp.sendFile('index.html', options)
     }
 
 }

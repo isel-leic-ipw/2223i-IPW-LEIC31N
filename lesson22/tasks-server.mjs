@@ -6,15 +6,18 @@ import express from 'express'
 import swaggerUi from 'swagger-ui-express'
 import yaml from 'yamljs'
 import cors from 'cors'
+import url from 'url'
 
 import * as tasksData from './data/tasks-data-mem.mjs'
 import * as usersData from './data/users-data.mjs'
 import tasksServicesInit from './services/tasks-services.mjs'
 import apiInit from './web/api/tasks-http-api.mjs'
 import siteInit from './web/site/tasks-http-site.mjs'
-
 const swaggerDocument = yaml.load('./docs/tasks-api.yaml')
 const PORT = 1904
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
 
 const tasksServices = tasksServicesInit(tasksData, usersData)
 const api = apiInit(tasksServices)
@@ -28,8 +31,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 app.use(express.json())
 
 // Web site routes
-app.get('/site/index', site.getIndex)
-
+app.use('/site/public', express.static(`${__dirname}./static-files`, {redirect: false, index: 'index.txt'}))
+app.get('/site/tasks/:id', site.getTask)
 
 // Web api routes 
 app.get('/api/tasks', api.getTasks)
