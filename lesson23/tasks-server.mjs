@@ -7,6 +7,8 @@ import swaggerUi from 'swagger-ui-express'
 import yaml from 'yamljs'
 import cors from 'cors'
 import url from 'url'
+import path from 'path'
+import hbs from 'hbs'
 
 import * as tasksData from './data/tasks-data-mem.mjs'
 import * as usersData from './data/users-data.mjs'
@@ -30,9 +32,16 @@ app.use(cors())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 app.use(express.json())
 
+// View engine setup
+const viewsPath = path.join(__dirname, 'web', 'site', 'views')
+app.set('view engine', 'hbs')
+app.set('views', viewsPath)
+hbs.registerPartials(path.join(viewsPath, 'partials'))
+
 // Web site routes
 app.use('/site/public', express.static(`${__dirname}./static-files`, {redirect: false, index: 'index.txt'}))
 app.get('/site/tasks/:id', site.getTask)
+app.get('/site/tasks', site.getTasks)
 
 // Web api routes 
 app.get('/api/tasks', api.getTasks)
