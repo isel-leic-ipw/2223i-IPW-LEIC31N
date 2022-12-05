@@ -31,6 +31,7 @@ let app = express()
 app.use(cors())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 app.use(express.json())
+app.use(express.urlencoded())
 
 // View engine setup
 const viewsPath = path.join(__dirname, 'web', 'site', 'views')
@@ -40,8 +41,10 @@ hbs.registerPartials(path.join(viewsPath, 'partials'))
 
 // Web site routes
 app.use('/site/public', express.static(`${__dirname}./static-files`, {redirect: false, index: 'index.txt'}))
+app.get('/site/tasks/new', site.getNewTaskForm)
 app.get('/site/tasks/:id', site.getTask)
 app.get('/site/tasks', site.getTasks)
+app.post('/site/tasks', site.createTask)
 
 // Web api routes 
 app.get('/api/tasks', api.getTasks)

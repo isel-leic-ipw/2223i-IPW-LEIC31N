@@ -73,10 +73,9 @@ export default function (tasksData, usersData) {
         if(!user) {
             throw errors.USER_NOT_FOUND()
         }
-        if(!isValidString(userToken, taskRepresentation.title)) {
+        if(!isValidString(taskRepresentation.title)) {
              throw errors.INVALID_PARAMETER('title')
         }
-    
         return tasksData.createTask(user.id, taskRepresentation)
     }
     

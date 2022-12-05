@@ -1,0 +1,11 @@
+<h2>Create new task</h2>
+<form action="/site/tasks" method="POST">
+    <p>
+        Task title: <input type="text" name="title" value="{{title}}">
+    </p>
+    <p>
+        Task description: <textarea name="description" value="{{description}}"></textarea>
+    </p>
+    <input type="submit" value="Create Task">
+
+</form>
