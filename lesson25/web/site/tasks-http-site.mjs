@@ -23,12 +23,14 @@ export default function (tasksServices) {
         getTask: handleRequest(getTask),
         getTasks: handleRequest(getTasks),
         getNewTaskForm: getNewTaskForm,
-        createTask: handleRequest(createTask)
+        createTask: handleRequest(createTask),
+        deleteTask: handleRequest(deleteTask),
+        updateTask: handleRequest(updateTask)
     }
 
     async function getTasks(req, rsp) {
         const tasks = await tasksServices.getTasks(req.token, req.query.q, req.query.skip, req.query.limit)
-        return new View('tasks', { title: 'All tasks', tasks: tasks.map(t => { return { title: t.title, description: t.description, important: t.title.includes("3")}})  })
+        return new View('tasks', { title: 'All tasks', tasks: tasks.map(t => { return { id: t.id, title: t.title, description: t.description, important: t.title.includes("3")}})  })
     }
 
     async function getTask(req, rsp) {
@@ -55,6 +57,16 @@ export default function (tasksServices) {
             }
             throw e
         }
+    }
+
+    async function deleteTask(req, rsp) {
+        const taskId = req.params.id
+        const task = await tasksServices.deleteTask(req.token, taskId)
+        rsp.redirect('/site/tasks')
+    }
+
+    async function updateTask(req, rsp) {
+        
     }
 
     function handleRequest(handler) {

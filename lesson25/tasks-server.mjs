@@ -39,12 +39,17 @@ app.set('view engine', 'hbs')
 app.set('views', viewsPath)
 hbs.registerPartials(path.join(viewsPath, 'partials'))
 
+
+app.use(foo)
 // Web site routes
 app.use('/site/public', express.static(`${__dirname}./static-files`, {redirect: false, index: 'index.txt'}))
 app.get('/site/tasks/new', site.getNewTaskForm)
 app.get('/site/tasks/:id', site.getTask)
 app.get('/site/tasks', site.getTasks)
 app.post('/site/tasks', site.createTask)
+app.post('/site/tasks/:id/delete', site.deleteTask)
+app.post('/site/tasks/:id/edit', site.updateTask)
+app.get('/foo', foo)
 
 // Web api routes 
 app.get('/api/tasks', api.getTasks)
@@ -59,3 +64,18 @@ console.log("End setting up server")
 
 // Route handling functions
 
+function foo(req, rsp, next) {
+    const COOKIE_COUNTER = "taskAppCookieCounter"
+
+    let cookies = req.get("Cookie")
+    let counterCookie = 0
+    if(cookies) {
+        let cookie =  cookies.split(";").find(c => c.includes(COOKIE_COUNTER))
+        if(cookie) {
+            counterCookie = Number(cookie.split("=")[1])+1
+        }
+
+    }
+    rsp.cookie(COOKIE_COUNTER, counterCookie)
+    next()
+}
