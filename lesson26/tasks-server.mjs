@@ -9,6 +9,11 @@ import cors from 'cors'
 import url from 'url'
 import path from 'path'
 import hbs from 'hbs'
+import cookieParser from 'cookie-parser'
+//import session from './my-session.mjs'
+import session from 'express-session'
+import fileStore from 'session-file-store'
+
 
 import * as tasksData from './data/tasks-data-mem.mjs'
 import * as usersData from './data/users-data.mjs'
@@ -31,7 +36,14 @@ let app = express()
 app.use(cors())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 app.use(express.json())
-app.use(express.urlencoded())
+app.use(express.urlencoded({extended: false}))
+app.use(cookieParser())
+const FileStore = fileStore(session)
+app.use(session({
+        secret: "Portugal campeão de mundo",
+        store: new FileStore()
+}))
+
 
 // View engine setup
 const viewsPath = path.join(__dirname, 'web', 'site', 'views')
@@ -40,7 +52,8 @@ app.set('views', viewsPath)
 hbs.registerPartials(path.join(viewsPath, 'partials'))
 
 
-app.use(foo)
+app.use(sessionMw)
+
 // Web site routes
 app.use('/site/public', express.static(`${__dirname}./static-files`, {redirect: false, index: 'index.txt'}))
 app.get('/site/tasks/new', site.getNewTaskForm)
@@ -49,7 +62,7 @@ app.get('/site/tasks', site.getTasks)
 app.post('/site/tasks', site.createTask)
 app.post('/site/tasks/:id/delete', site.deleteTask)
 app.post('/site/tasks/:id/edit', site.updateTask)
-app.get('/foo', foo)
+
 
 // Web api routes 
 app.get('/api/tasks', api.getTasks)
@@ -64,18 +77,26 @@ console.log("End setting up server")
 
 // Route handling functions
 
-function foo(req, rsp, next) {
+
+function cookieMw(req, rsp, next) {
     const COOKIE_COUNTER = "taskAppCookieCounter"
 
-    let cookies = req.get("Cookie")
-    let counterCookie = 0
-    if(cookies) {
-        let cookie =  cookies.split(";").find(c => c.includes(COOKIE_COUNTER))
-        if(cookie) {
-            counterCookie = Number(cookie.split("=")[1])+1
-        }
-
+    // rsp.cookie(COOKIE_COUNTER, (Number(req.cookies[COOKIE_COUNTER]) || 0) + 1)
+    
+    let counter = Number(req.cookies[COOKIE_COUNTER])
+    if(isNaN(counter)) {
+        counter = 0
     }
-    rsp.cookie(COOKIE_COUNTER, counterCookie)
+    counter += 1
+    rsp.cookie(COOKIE_COUNTER, counter)
+
+    next()
+}
+
+function sessionMw(req, rsp, next) {
+    req.session.counter = (req.session.counter || 0) + 1
+    // let counter = req.session.counter || 0
+    // req.session.counter = counter + 1
+    console.log(req.session.counter)
     next()
 }
