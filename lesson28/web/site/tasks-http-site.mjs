@@ -6,8 +6,6 @@
 
 
 
-import { createTask } from '../../data/tasks-data-mem.mjs'
-import errors from '../../errors.mjs'
 import toHttpResponse from '../api/response-errors.mjs'
 
 function View(name, data) {
@@ -36,7 +34,7 @@ export default function (tasksServices) {
     async function getTask(req, rsp) {
         const taskId = req.params.id
         const task = await tasksServices.getTask(req.token, taskId)
-        return new View('task', task)
+        return new View('task', { task: task, token: req.token} )
     }
 
     async function getNewTaskForm(req, rsp) {

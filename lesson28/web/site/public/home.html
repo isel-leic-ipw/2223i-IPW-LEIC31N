@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/site/public/site.css" />
+    <meta charset="utf-8" />
+    <title>Home page</title>
+    
+  </head>
+  <body>
+    <h1 class="my-heading">This is my homepage</h1>
+    <input type="button" id="b1" value="Click me">
+
+    <script>
+        const btn = document.querySelector("#b1")
+        console.log(btn.value)
+        btn.onclick = clickHandler
+        //btn.addEventListener("click", clickHandler)
+
+        function clickHandler() {
+            alert("button clicked")
+        }
+        
+    </script>
+  </body>
+</html>

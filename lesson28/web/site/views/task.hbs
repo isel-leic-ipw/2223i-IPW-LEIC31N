@@ -1,1 +1,28 @@
- {{> taskP}}
+ {{> taskP this.task}}
+
+ <input type="button" id="b1" value="Delete task using client script">
+
+<script>
+    const btn = document.querySelector("#b1")
+    console.log(btn.value)
+    btn.onclick = clickHandler
+    //btn.addEventListener("click", clickHandler)
+
+    async function clickHandler() {
+        const uri = `/api/tasks/{{this.task.id}}`
+        
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer {{this.token}}`
+            }
+
+        }
+        const rsp = await fetch(uri, options)
+        if(rsp.ok) {
+           location = '/site/tasks' 
+        }
+        
+
+    }
+</script>

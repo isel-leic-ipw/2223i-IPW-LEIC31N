@@ -55,7 +55,8 @@ hbs.registerPartials(path.join(viewsPath, 'partials'))
 app.use(sessionMw)
 
 // Web site routes
-app.use('/site/public', express.static(`${__dirname}./static-files`, {redirect: false, index: 'index.txt'}))
+app.use('/site/public', express.static(`${__dirname}/web/site/public`, {redirect: false, index: 'index.txt'}))
+
 app.get('/site/tasks/new', site.getNewTaskForm)
 app.get('/site/tasks/:id', site.getTask)
 app.get('/site/tasks', site.getTasks)
